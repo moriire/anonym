@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row main justify-content-center align-items-center">
+    <div class="col-md-6 col-sm-8 col-xs-10">
+        <div class="card-header">
+            <h2 class="text-light text-center">Login</h2>
+        </div>
+        <div class="table table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Message</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    <tr>
+                        <td>{{ row.id }}</td>
+                        <td>{{ row.content }}</td>
+                        <td>1</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+        
+</div>
+{% endblock %}

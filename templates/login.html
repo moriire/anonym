@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row main justify-content-center align-items-center">
+    <div class="col-md-6 col-sm-8 col-xs-10">
+        <div class="card-header">
+            <h2 class="text-light text-center">Login</h2>
+        </div>
+        <form action="" method="POST" class="form card-body">
+            <div class="input-group form-floating mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" name="username" id="username" required placeholder="username" class="form-control">
+            </div>
+            <div class="input-group form-floating mb-3">
+                <label for="password" class="form-label text-dark">Password</label>
+                <input type="password" id="password" name="password" required placeholder="password" class="form-control text-dark">
+            </div>
+            <div class="input-group d-flex justify-content-center">
+                <input type="submit" class="btn btn-primary btn-block" value="{{"login" if request.endpoint=='login' else 'register' }}">
+            </div>
+            <div class="input-group">
+                {% if request.endpoint == 'login' %}
+                <p class="text-light">Don't have an account? <span><a href="/register" class="btn-link">Signup here</a></span></p>
+                {% elif request.endpoint == 'register' %}
+                <p class="text-light">Already signed up? <span><a href="/login" class="btn-link">Login here</a></span></p>
+                {% endif %}      
+            </div>
+         </form> 
+    </div>
+        
+</div>
+{% endblock %}
