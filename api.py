@@ -59,7 +59,7 @@ def success():
 @login_required
 def dash():
     user_hex = bytes(current_user.username, "utf8").hex()
-    link = f"{request.base}/{user_hex}"
+    link = f"{request.host_url}/{user_hex}"
     rows = Message.query.all()
     return render_template("dashboard.html", rows=rows, username=current_user.username, link=link)
 
