@@ -7,8 +7,17 @@
     <link rel="stylesheet" href="{{ url_for('static', filename = 'css/bootstrap.min.css')}}">
 </head>
 <body class="bg-success">
-    <div class="container">
-        <div class="row vh-100">
+    <div class="container-fluid">
+        <div class="row vh-100 justify-content-center">
+            <p class="text-light text-center d-block">
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            {{ message }}
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </p>
             {% block content %} {% endblock %}
         </div>
     </div>

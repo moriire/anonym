@@ -1,4 +1,4 @@
-from flask import Flask,redirect, url_for, Response, render_template, request
+from flask import Flask,redirect, url_for, Response, render_template, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import (LoginManager,
@@ -7,12 +7,15 @@ from flask_login import (LoginManager,
                          login_user,
                          current_user,
                          logout_user)
+import base64
+import os
 from flask_migrate import Migrate
+base = os.path.basename(__file__)
 bcrypt = Bcrypt()
 app = Flask(__name__, static_folder="assets/")
 login_manager = LoginManager()
 app.config["SECRET_KEY"] = 'development key'
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///anonym.sqlite"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///sanonym.sqlite"
 db = SQLAlchemy(app)
 migrate = Migrate(db)
 class User(db.Model, UserMixin):
@@ -22,16 +25,16 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(512), nullable=False, unique=True)
     #sent_on = db.Column(db.Datetime, nullable=False)
     def __str__(self):
-        return self.id
-    
+        return self.username    
+from datetime import datetime
 class Message(db.Model):
     __tablename__ = "message"
     id = db.Column(db.Integer, primary_key=True)
     owner = db.Column(db.Integer, db.ForeignKey("user.id"))
     content = db.Column(db.String(512), nullable=False)
-    #sent_on = db.Column(db.Datetime(100), nullable=False)
+    sent_on = db.Column(db.DateTime, nullable=False, default = datetime.utcnow)
     def __str__(self):
-        return self.owner
+        return f"<{self.owner}>"
     
 @app.route("/register", methods=["POST", "GET"])
 def register():
@@ -40,8 +43,12 @@ def register():
         password = bcrypt.generate_password_hash(request.form.get("password"))
         create_user = User(username=username, password=password)
         db.session.add(create_user)
-        db.session.commit()
-        return redirect(url_for("login"))
+        try:
+            db.session.commit()
+        except:
+            flash("User already exist!!!")
+            return redirect("/register")
+        return redirect("/")
     return render_template("login.html")
 
 @app.route("/sucess")
@@ -52,41 +59,51 @@ def success():
 @login_required
 def dash():
     rows = Message.query.all()
-    return render_template("dashboard.html", rows=rows)
+    return render_template("dashboard.html", rows=rows, username=current_user.username)
 
-@app.route("/secret", methods=["POST", "GET"])
-def msg():
+@app.route("/<secret>", methods=["POST", "GET"])
+def msg(secret):
     if request.method == "POST":
-        query = request.args.to_dict()
-        user = query.get("user", None)
+        username  = bytes.fromhex(secret).decode("utf8")
+        user = User.query.filter_by(username = username).first()
+        print(user)
         if user:
-            print(user)
-            owner = user
+            owner = user.id
+            content = request.form.get("message")
+            create_user = Message(owner=owner, content=content)
+            db.session.add(create_user)
+            db.session.commit()
+            flash("Message sent. Create your own link")
+            return redirect(url_for("register"))
         else:
-            redirect(url_for("index"))
-        content = request.form.get("message")
-        create_user = Message(owner=owner, content=content)
-        db.session.add(create_user)
-        db.session.commit()
-        return redirect(url_for("success"))
+            return redirect("/register")
     return render_template("message.html")
 
-@app.route("/login", methods=["POST", "GET"])
+@app.route("/", methods=["POST", "GET"])
 def login():
-    if request.method == "POST":
-        username = request.form.get("username")
-        password = bcrypt.generate_password_hash(request.form.get("password"))
-        user = User.query.filter_by(username=username).first()
-        if user:
-            login_user(user, remember=True)
-            return redirect(url_for("dash"))
-    return render_template("login.html", data = request.form)
+    match current_user.is_authenticated:
+        case True:
+            flash("Already loggedin")
+            return redirect("/dashboard")
+        case False:
+            if request.method == "POST":
+                username = request.form.get("username")
+                password = bcrypt.generate_password_hash(request.form.get("password"))
+                user = User.query.filter_by(username=username).first()
+                if user:
+                    login_user(user)#, remember=True)
+                    #flash(f"Log in successful")
+                    return redirect("dashboard")
+                else:
+                    flash("invalid user detail")
+                    return redirect("register")
+    return render_template("login.html")
 
 @app.route("/logout")
 def logout():
-    if User.is_authenticated():
-        logout_user()
-        redirect(url_for("index"))
+    logout_user()
+    flash("Logged out successfully!!")
+    return redirect("/")
 
 @app.route("/")
 @login_required
@@ -100,7 +117,7 @@ def load_user(user_id):
 migrate.init_app(app)
 #migrate.db()
 login_manager.init_app(app)
-login_manager.login_view = "login"
+login_manager.login_view = "/"
 login_manager.session_protection="strong"
 login_manager.login_message="Login Successful"
 login_manager.login_message_category="info"
