@@ -58,8 +58,10 @@ def success():
 @app.route("/dashboard")
 @login_required
 def dash():
+    user_hex = bytes(current_user.username, "utf8").hex()
+    link = f"{request.base}/{user_hex}"
     rows = Message.query.all()
-    return render_template("dashboard.html", rows=rows, username=current_user.username)
+    return render_template("dashboard.html", rows=rows, username=current_user.username, link=link)
 
 @app.route("/<secret>", methods=["POST", "GET"])
 def msg(secret):
