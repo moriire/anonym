@@ -38,6 +38,9 @@ class Message(db.Model):
     
 @app.route("/register", methods=["POST", "GET"])
 def register():
+    if current_user.is_authenticated:
+        flash("Already logged in!")
+        return redirect("dashboard")
     if request.method == "POST":
         username = request.form.get("username")
         password = bcrypt.generate_password_hash(request.form.get("password"))
@@ -48,7 +51,9 @@ def register():
         except:
             flash("User already exist!!!")
             return redirect("/register")
-        return redirect("/")
+        else:
+            flash("Registration successful. Please login!!!")
+            return redirect("/")
     return render_template("login.html")
 
 @app.route("/sucess")
@@ -59,7 +64,7 @@ def success():
 @login_required
 def dash():
     user_hex = bytes(current_user.username, "utf8").hex()
-    link = f"{request.host_url}/{user_hex}"
+    link = f"{request.host_url}{user_hex}"
     rows = Message.query.all()
     return render_template("dashboard.html", enum_rows=enumerate(rows), username=current_user.username, link=link)
 
