@@ -20,15 +20,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for row in rows %}
+                    {% for i, row in  enum_rows %}
                     <tr>
-                        <td>niceDate({{ row.sent_on }})</td>
+                        <td id="nicedate">
+                            {{ i+1 }}
+                        </td>
                         <td>{{ row.content }}</td>
                         <td> <button onclick="delMessage({{ row.id }})" class="btn btn-danger">delete</button></td>
                     </tr>
                     {% endfor %}
                     <tr>
-                        <td colspan="1" class="text-center"><a href="logout">logout</a></td>
+                        <td colspan="1" class="text-center text-decoration-none"><a href="logout">logout</a></td>
                     </tr>
                 </tbody>
             </table>
