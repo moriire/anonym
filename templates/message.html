@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row main justify-content-center">
+    <div class="col-md-6 col-sm-8 col-xs-10">
+        <div class="card-header">
+            <h2 class="text-light text-center">You are anonymous</h2>
+            <p class="blockuotes text-light text-center">
+                We promise to keep your identity and message a secret
+            </p>
+        </div>
+        <form action="" method="POST" class="card-body">
+            <div class="form-floating mb-3">
+                <textarea type="text" name="message" id="message" required placeholder="Your secret message" class="form-control"></textarea>
+                <label for="message">Message</label>
+            </div>
+            <div class="input-group float-right"><input type="submit" class="btn btn-primary btn-block"></div>
+         </form> 
+         <div class="card-footer justify-content-between d-flex">
+            <a class="btn-link" href="/register">Create Your Link</a>
+         </div>
+    </div>   
+</div>
+{% endblock %}
