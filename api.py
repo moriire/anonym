@@ -7,15 +7,15 @@ from flask_login import (LoginManager,
                          login_user,
                          current_user,
                          logout_user)
-import base64
 import os
+base = os.path.dirname(__file__)
 from flask_migrate import Migrate
-base = os.path.basename(__file__)
+# = os.path.basename(__file__)
 bcrypt = Bcrypt()
 app = Flask(__name__, static_folder="assets/")
 login_manager = LoginManager()
 app.config["SECRET_KEY"] = 'development key'
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///sanonym.sqlite"
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{base}/anonym.sqlite"
 db = SQLAlchemy(app)
 migrate = Migrate(db)
 class User(db.Model, UserMixin):
@@ -61,14 +61,21 @@ def dash():
     user_hex = bytes(current_user.username, "utf8").hex()
     link = f"{request.host_url}/{user_hex}"
     rows = Message.query.all()
-    return render_template("dashboard.html", rows=rows, username=current_user.username, link=link)
+    return render_template("dashboard.html", enum_rows=enumerate(rows), username=current_user.username, link=link)
+
+@app.route("/delete/<msg_id>")
+@login_required
+def delete(msg_id):
+    row = Message.query.filter_by(id=msg_id).first()
+    db.session.delete(row)
+    db.session.commit()
+    return
 
 @app.route("/<secret>", methods=["POST", "GET"])
 def msg(secret):
     if request.method == "POST":
         username  = bytes.fromhex(secret).decode("utf8")
         user = User.query.filter_by(username = username).first()
-        print(user)
         if user:
             owner = user.id
             content = request.form.get("message")
