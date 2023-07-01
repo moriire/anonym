@@ -5,24 +5,26 @@
         <div class="card-header p-4">
             <h2 class="text-light text-center p-3">Welcome {{ username.capitalize() }}</h2>
         </div>
+        <div class="mb-3" style="display: flex; flex-direction: row; align-items:center; justify-content: space-between;">
+                <input value="{{ link }}" readonly class="form-control mr-5" id="copythis">
+                <input type="button" onclick="copy()" class="btn btn-success border" value="copy" style="margin: 10px 5px;">
+        </div>
         <div class="table-responsive" style="height: 60vh;">
-            <div class="input-group">
-                <input value="{{ link }}" readonly class="form-control" >
-            </div>
+            
             <table class="table table-hover table-secondary">
                 <thead>
                     <tr>
                         <th>#</th>
                         <th>Message</th>
-                        <th>Date</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for row in rows %}
                     <tr>
-                        <td>{{ row.sent_on }}</td>
+                        <td>niceDate({{ row.sent_on }})</td>
                         <td>{{ row.content }}</td>
-                        <td> <button onclick="" class="btn btn-danger">delete</button></td>
+                        <td> <button onclick="delMessage({{ row.id }})" class="btn btn-danger">delete</button></td>
                     </tr>
                     {% endfor %}
                     <tr>

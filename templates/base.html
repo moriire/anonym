@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>{% block title %}Anonym{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename = 'css/bootstrap.min.css')}}">
 </head>
 <body class="bg-success">
@@ -23,5 +23,31 @@
     </div>
     <script src="{{ url_for('static', filename ='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename ='js/bootstrap.bundle.min.js') }}"></script>
+    <script>
+        const delMessage= async (msg_id)=>{
+            await fetch(`/delete/${msg_id}`)
+            .then(res=>{
+                location.reload(true)
+            })
+            .catch(err=>{
+                alert("Cannot be deleted at this time. Pls refresh the page and try again!")
+            })
+        }
+        const copy = async () => {
+            var x = document.getElementById("copythis");
+            //x.select()
+            try {
+                await navigator.clipboard.writeText(x.value)
+                x.t
+                alert("link copied")
+            } catch(err){
+                alert("error while copying", err)
+            }
+        }
+        function niceDate(dt){
+            let changed_dt = new Date(dt)
+            return changed_dt.toLocaleString()
+        }
+    </script>
 </body>
 </html>
