@@ -65,7 +65,7 @@ def success():
 def dash():
     user_hex = bytes(current_user.username, "utf8").hex()
     link = f"{request.host_url}{user_hex}"
-    rows = Message.query.filter_by(username=current_user.username)
+    rows = Message.query.filter_by(owner=current_user.id)
     return render_template("dashboard.html", enum_rows=enumerate(rows), username=current_user.username, link=link)
 
 @app.route("/delete/<msg_id>")
